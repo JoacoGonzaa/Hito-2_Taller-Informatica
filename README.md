@@ -1,4 +1,4 @@
-# ☕ Café del Sur - MVP Desplegado en la Nube (Hito 2)
+# Café del Sur - MVP Desplegado en la Nube (Hito 2)
 
 Este repositorio contiene el Producto Mínimo Viable (MVP) de la plataforma web **Café del Sur**, desplegado de manera automatizada y reproducible en **AWS** utilizando **Terraform** como herramienta de Infraestructura como Código (IaC).
 
@@ -6,7 +6,7 @@ El proyecto consta de una aplicación web interactiva en Node.js, con catálogo 
 
 ---
 
-## 🏗️ Arquitectura en la Nube (AWS)
+## Arquitectura en la Nube (AWS)
 
 La infraestructura diseñada e implementada se compone de los siguientes servicios integrados:
 
@@ -19,7 +19,7 @@ La infraestructura diseñada e implementada se compone de los siguientes servici
 
 ---
 
-## ⚙️ Características Implementadas
+## Características Implementadas
 
 1. **Aprovisionamiento Automatizado (IaC):**  
    Toda la red y los servicios de cómputo están declarados en archivos de Terraform `.tf`, permitiendo destruir y replicar el entorno con comandos simples.
@@ -36,15 +36,13 @@ La infraestructura diseñada e implementada se compone de los siguientes servici
 
 ---
 
-## 🌐 URL del Proyecto
-
-La aplicación se encuentra disponible en:
+##  URL
 
 http://cafe-del-sur-alb-685753372.us-east-1.elb.amazonaws.com/
 
 ---
 
-## 👥 Integrantes
+## Integrantes
 
 * Alonso Duarte
 * Joaquín González
