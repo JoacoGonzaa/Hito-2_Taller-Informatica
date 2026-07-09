@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pasarela de Pago - Café del Sur</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .checkout-container {
+        max-width: 500px;
+        margin: 50px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        text-align: left;
+        margin-bottom: 15px;
+      }
+      .form-group input {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+      }
+      .detalles-compra {
+        background: #f5f1eb;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        border-left: 5px solid #c97b36;
+      }
+    </style>
+  </head>
+  <body style="background-color: #f5f1eb; padding: 20px">
+    <div class="checkout-container">
+      <h2 style="color: #4e342e; margin-bottom: 10px">
+        ☕ Pasarela de Pago Ficticia
+      </h2>
+      <p style="color: #666; margin-bottom: 20px">
+        Estás a un paso de disfrutar del mejor sabor sureño
+      </p>
+
+      <div class="detalles-compra">
+        <p>
+          <strong>Producto:</strong>
+          <span id="nombre-producto">Cargando...</span>
+        </p>
+        <p style="font-size: 1.2rem; margin-top: 5px">
+          <strong>Total a pagar:</strong>
+          <span id="precio-producto" style="color: #c97b36; font-weight: bold"
+            >$0</span
+          >
+        </p>
+      </div>
+
+      <form id="form-pago">
+        <div class="form-group">
+          <label>Nombre del Titular</label>
+          <input type="text" id="nombre" placeholder="Juan Pérez" required />
+        </div>
+        <div class="form-group">
+          <label>Número de Tarjeta</label>
+          <input
+            type="text"
+            id="tarjeta"
+            placeholder="4556 1234 5678 9101"
+            required
+          />
+        </div>
+        <div
+          class="form-group"
+          style="display: flex; flex-direction: row; gap: 10px"
+        >
+          <div style="flex: 1" class="form-group">
+            <label>Vencimiento</label>
+            <input type="text" placeholder="12/29" required />
+          </div>
+          <div style="flex: 1" class="form-group">
+            <label>CVV</label>
+            <input type="password" placeholder="123" required />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn"
+          style="width: 100%; border: none; cursor: pointer; margin-top: 10px"
+        >
+          Confirmar Pago Transbank Simulador
+        </button>
+
+        <a
+          href="index.html"
+          style="
+            display: block;
+            margin-top: 15px;
+            color: #777;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: 0.3s;
+          "
+          onmouseover="this.style.color = '#4e342e'"
+          onmouseout="this.style.color = '#777'"
+        >
+          ❌ Cancelar y volver al menú
+        </a>
+      </form>
+      <div
+        id="resultado-pago"
+        style="margin-top: 25px; font-weight: bold; font-size: 1.1rem"
+      ></div>
+    </div>
+
+    <script>
+      // Capturar las variables que vienen en la URL (?producto=X&precio=Y)
+      const urlParams = new URLSearchParams(window.location.search);
+      const producto = urlParams.get("producto");
+      const precio = urlParams.get("precio");
+
+      // Mostrarlas en pantalla
+      document.getElementById("nombre-producto").innerText = producto;
+      document.getElementById("precio-producto").innerText =
+        `$${parseInt(precio).toLocaleString("es-CL")}`;
+
+      // Enviar el pago al backend en Node.js
+      document
+        .getElementById("form-pago")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const datos = {
+            nombre: document.getElementById("nombre").value,
+            tarjeta: document.getElementById("tarjeta").value,
+            total: precio,
+          };
+
+          try {
+            const response = await fetch("/api/pagar", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(datos),
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === "aprobado") {
+              document.getElementById("resultado-pago").innerHTML = `
+                        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; color: green; border: 1px solid green;">
+                            🟢 ${resultado.mensaje}<br>
+                            <small style="color: #555;">ID Transacción: ${resultado.transaccion_id}</small>
+                        </div>
+                    `;
+            } else {
+              document.getElementById("resultado-pago").innerText =
+                `🔴 Error: ${resultado.mensaje}`;
+            }
+          } catch (error) {
+            document.getElementById("resultado-pago").innerText =
+              "🔴 Error: No se pudo conectar con el servidor de AWS ECS.";
+          }
+        });
+    </script>
+  </body>
+</html>
