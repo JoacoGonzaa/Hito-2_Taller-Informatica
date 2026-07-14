@@ -5,6 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Café del Sur</title>
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* ==========================================
+         MEJORA DE DISEÑO: Alineación Simétrica
+         ========================================== */
+      .cards {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap; /* Soporte para dispositivos móviles */
+      }
+
+      .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        width: 300px;
+
+        /* Flexbox vertical para forzar la misma altura */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      /* Contenedor interno para el texto y precio */
+      .card-content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* Estira este contenedor para rellenar la tarjeta */
+        padding: 15px;
+        text-align: center;
+      }
+
+      /* Obliga al párrafo a empujar lo que tiene abajo */
+      .card-content p {
+        flex-grow: 1;
+        margin-bottom: 15px;
+        color: #555;
+      }
+
+      .card-content h3 {
+        margin: 10px 0;
+        color: #4e342e;
+      }
+
+      .card-content span {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #c97b36;
+        margin-bottom: 15px;
+        display: block;
+      }
+
+      .btn-agregar {
+        background-color: #4e342e;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+        width: 100%;
+        margin-top: auto; /* Se imanta automáticamente al fondo de la tarjeta */
+      }
+
+      .btn-agregar:hover {
+        background-color: #6d4c41;
+      }
+
+      /* Estilos para la sección del Carrito */
+      .cart-section {
+        background-color: #f5f5f5;
+        padding: 40px 20px;
+        text-align: center;
+        border-top: 2px dashed #4e342e;
+      }
+      .cart-container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+      .cart-item button {
+        background: #e53935;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -17,7 +118,7 @@
 
     <nav>
       <a href="#menu">Menú</a>
-      <a href="#galeria">Galería</a>
+      <a href="#carrito-seccion">Carrito</a>
       <a href="#nosotros">Nosotros</a>
       <a href="#contacto">Contacto</a>
     </nav>
@@ -44,64 +145,103 @@
 
       <div class="cards">
         <div class="card">
-          <a
-            href="pago.html?producto=Espresso&precio=2500"
-            style="display: block; cursor: pointer"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1517701604599-bb29b565090c?q=80&w=1200&auto=format&fit=crop"
-              alt="Espresso"
-            />
-          </a>
-          <h3>Espresso</h3>
-          <p>Café intenso y aromático preparado al momento.</p>
-          <span>$2.500</span>
+          <img
+            src="https://images.unsplash.com/photo-1517701604599-bb29b565090c?q=80&w=1200&auto=format&fit=crop"
+            alt="Espresso"
+          />
+          <div class="card-content">
+            <h3>Espresso</h3>
+            <p>Café intenso y aromático preparado al momento.</p>
+            <span>$2.500</span>
+            <button
+              class="btn-agregar"
+              onclick="agregarAlCarrito('Espresso', 2500)"
+            >
+              Agregar al Carrito
+            </button>
+          </div>
         </div>
 
         <div class="card">
-          <a
-            href="pago.html?producto=Cappuccino&precio=3200"
-            style="display: block; cursor: pointer"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop"
-              alt="Cappuccino"
-            />
-          </a>
-          <h3>Cappuccino</h3>
-          <p>Espuma cremosa y sabor equilibrado.</p>
-          <span>$3.200</span>
+          <img
+            src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop"
+            alt="Cappuccino"
+          />
+          <div class="card-content">
+            <h3>Cappuccino</h3>
+            <p>Espuma cremosa y sabor equilibrado para comenzar el día.</p>
+            <span>$3.200</span>
+            <button
+              class="btn-agregar"
+              onclick="agregarAlCarrito('Cappuccino', 3200)"
+            >
+              Agregar al Carrito
+            </button>
+          </div>
         </div>
 
         <div class="card">
-          <a
-            href="pago.html?producto=Latte%20Vainilla&precio=3800"
-            style="display: block; cursor: pointer"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1200&auto=format&fit=crop"
-              alt="Latte Vainilla"
-            />
-          </a>
-          <h3>Latte Vainilla</h3>
-          <p>Mezcla suave y dulce para cualquier momento.</p>
-          <span>$3.800</span>
+          <img
+            src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1200&auto=format&fit=crop"
+            alt="Latte Vainilla"
+          />
+          <div class="card-content">
+            <h3>Latte Vainilla</h3>
+            <p>Mezcla suave y dulce para cualquier momento del día.</p>
+            <span>$3.800</span>
+            <button
+              class="btn-agregar"
+              onclick="agregarAlCarrito('Latte Vainilla', 3800)"
+            >
+              Agregar al Carrito
+            </button>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <section class="cart-section" id="carrito-seccion">
+      <h2>Tu Carrito de Compras</h2>
+      <div class="cart-container">
+        <div id="lista-carrito">
+          <p style="color: #777">
+            Tu carrito está vacío. ¡Elige un café del menú!
+          </p>
+        </div>
+        <div
+          style="
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: right;
+          "
+        >
+          Total General: <span id="cart-total-display">$0</span>
+        </div>
+        <button
+          onclick="procederAlPago()"
+          class="btn"
+          style="
+            display: inline-block;
+            margin-top: 15px;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          Proceder al Pago
+        </button>
       </div>
     </section>
 
     <section class="gallery" id="galeria">
       <h2>Galería</h2>
-
       <div class="gallery-grid">
         <img
           src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=1200&auto=format&fit=crop"
         />
-
         <img
           src="https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1200&auto=format&fit=crop"
         />
-
         <img
           src="https://images.unsplash.com/photo-1498804103079-a6351b050096?q=80&w=1200&auto=format&fit=crop"
         />
@@ -110,7 +250,6 @@
 
     <section class="about" id="nosotros">
       <h2>Sobre Nosotros</h2>
-
       <p>
         Café del Sur nace como un emprendimiento inspirado en la cultura del sur
         de Chile.
@@ -119,94 +258,77 @@
 
     <section class="contact" id="contacto">
       <h2>Contacto</h2>
-
       <p>📍 Puerto Montt</p>
       <p>📞 +56 9 1234 5678</p>
       <p>✉ contacto@cafedelsur.cl</p>
     </section>
-    <section
-      class="checkout-section"
-      id="pago"
-      style="padding: 60px 20px; text-align: center; background: #fff"
-    >
-      <h2>Sección de Pago Ficticia</h2>
-      <p style="margin-bottom: 20px">Simula tu compra de Café del Sur</p>
-
-      <form
-        id="form-pago"
-        style="
-          max-width: 400px;
-          margin: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 15px;
-        "
-      >
-        <input
-          type="text"
-          id="nombre"
-          placeholder="Nombre en la tarjeta"
-          required
-          style="padding: 10px; border-radius: 5px; border: 1px solid #ccc"
-        />
-        <input
-          type="text"
-          id="tarjeta"
-          placeholder="Número de tarjeta ficticia (ej: 1234 5678)"
-          required
-          style="padding: 10px; border-radius: 5px; border: 1px solid #ccc"
-        />
-        <input type="hidden" id="total" value="9500" />
-        <button type="submit" class="btn" style="border: none; cursor: pointer">
-          Pagar $9.500
-        </button>
-      </form>
-
-      <div
-        id="resultado-pago"
-        style="margin-top: 20px; font-weight: bold; color: #4e342e"
-      ></div>
-    </section>
 
     <script>
-      document
-        .getElementById("form-pago")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
+      let carrito = [];
 
-          const datos = {
-            nombre: document.getElementById("nombre").value,
-            tarjeta: document.getElementById("tarjeta").value,
-            total: document.getElementById("total").value,
-          };
+      function agregarAlCarrito(nombre, precio) {
+        const itemExistente = carrito.find((item) => item.nombre === nombre);
+        if (itemExistente) {
+          itemExistente.cantidad += 1;
+        } else {
+          carrito.push({ nombre, precio, cantidad: 1 });
+        }
+        actualizarCarritoUI();
+      }
 
-          try {
-            const response = await fetch("/api/pagar", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(datos),
-            });
+      function eliminarDelCarrito(index) {
+        carrito.splice(index, 1);
+        actualizarCarritoUI();
+      }
 
-            const resultado = await response.json();
+      function calcularTotal() {
+        return carrito.reduce(
+          (total, item) => total + item.precio * item.cantidad,
+          0,
+        );
+      }
 
-            if (resultado.status === "aprobado") {
-              document.getElementById("resultado-pago").innerHTML = `
-          <p style="color: green;">🟢 ${resultado.mensaje}</p>
-          <small>ID Transacción: ${resultado.transaccion_id}</small>
-        `;
-            } else {
-              document.getElementById("resultado-pago").innerText =
-                `🔴 Error: ${resultado.mensaje}`;
-            }
-          } catch (error) {
-            document.getElementById("resultado-pago").innerText =
-              "🔴 No se pudo conectar con el servidor de pagos.";
-          }
+      function actualizarCarritoUI() {
+        const listaHTML = document.getElementById("lista-carrito");
+        const totalDisplay = document.getElementById("cart-total-display");
+
+        if (carrito.length === 0) {
+          listaHTML.innerHTML = `<p style="color: #777;">Tu carrito está vacío. ¡Elige un café del menú!</p>`;
+          totalDisplay.innerText = "$0";
+          return;
+        }
+
+        let html = "";
+        carrito.forEach((item, index) => {
+          const subtotal = item.precio * item.cantidad;
+          html += `
+            <div class="cart-item">
+              <span><strong>${item.nombre}</strong> (x${item.cantidad})</span>
+              <span>$${subtotal.toLocaleString("es-CL")}</span>
+              <button onclick="eliminarDelCarrito(${index})">Quitar</button>
+            </div>
+          `;
         });
+
+        listaHTML.innerHTML = html;
+        totalDisplay.innerText = `$${calcularTotal().toLocaleString("es-CL")}`;
+      }
+
+      function procederAlPago() {
+        if (carrito.length === 0) {
+          alert("⚠️ Tu carrito está vacío. Agrega un café antes de pagar.");
+          return;
+        }
+
+        localStorage.setItem("total_compra", calcularTotal());
+        localStorage.setItem("carrito_compra", JSON.stringify(carrito));
+
+        window.location.href = "pago.html";
+      }
     </script>
 
     <footer>
-      <p>© 2026 Café del Sur | AWS EC2</p>
+      <p>© 2026 Café del Sur | AWS ECS Fargate</p>
     </footer>
   </body>
 </html>

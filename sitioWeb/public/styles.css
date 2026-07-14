@@ -104,19 +104,63 @@ nav a:hover{
 .cards{
     display:flex;
     justify-content:center;
-    gap:30px;
+    gap:20px;
     flex-wrap:wrap;
 }
 
 .card{
-    background:white;
-    width:320px;
-    border-radius:15px;
-    overflow:hidden;
-    box-shadow:0 5px 15px rgba(0,0,0,0.1);
-    transition:0.3s;
+  background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    width: 300px;
+    padding-bottom: 20px;
+    /* Reglas mágicas de alineación */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Empuja el contenido para llenar el espacio */
 }
 
+/* 2. Un contenedor interno para agrupar imagen, título y texto */
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Hace que este bloque use todo el espacio disponible */
+    padding: 15px;
+  }
+
+  .card-content p {
+    flex-grow: 1; /* Esto empuja el precio y el botón hacia el fondo de manera uniforme */
+    margin-bottom: 15px;
+  }
+
+  /* 3. Estilo del botón (ahora siempre alineado abajo) */
+  .btn-agregar {
+    background-color: #4e342e;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+    width: 100%; /* Ocupa todo el ancho de la tarjeta de forma simétrica */
+    margin-top: auto; /* Empuja el botón al fondo pase lo que pase */
+  }
+  
+  .btn-agregar:hover {
+    background-color: #6d4c41;
+  }
+  
+  /* Estilo para los subtítulos y precios */
+  .card-content span {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #c97b36;
+    margin-bottom: 10px;
+    display: block;
+  }
+  
 .card:hover{
     transform:translateY(-10px);
 }

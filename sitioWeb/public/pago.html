@@ -27,6 +27,11 @@
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 1rem;
+        transition: border-color 0.3s;
+      }
+      .form-group input:focus {
+        border-color: #c97b36;
+        outline: none;
       }
       .detalles-compra {
         background: #f5f1eb;
@@ -34,6 +39,19 @@
         border-radius: 10px;
         margin-bottom: 25px;
         border-left: 5px solid #c97b36;
+        text-align: left;
+      }
+      .lista-resumen {
+        margin: 5px 0 0 15px;
+        padding: 0;
+        font-size: 0.95rem;
+        color: #555;
+      }
+      .error-feedback {
+        color: #e53935;
+        font-size: 0.85rem;
+        margin-top: 3px;
+        display: none;
       }
     </style>
   </head>
@@ -47,11 +65,16 @@
       </p>
 
       <div class="detalles-compra">
-        <p>
-          <strong>Producto:</strong>
-          <span id="nombre-producto">Cargando...</span>
-        </p>
-        <p style="font-size: 1.2rem; margin-top: 5px">
+        <p><strong>Detalle de tu pedido:</strong></p>
+        <ul id="resumen-pedido" class="lista-resumen"></ul>
+        <p
+          style="
+            font-size: 1.2rem;
+            margin-top: 15px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+          "
+        >
           <strong>Total a pagar:</strong>
           <span id="precio-producto" style="color: #c97b36; font-weight: bold"
             >$0</span
@@ -59,36 +82,74 @@
         </p>
       </div>
 
-      <form id="form-pago">
+      <form id="form-pago" novalidate>
         <div class="form-group">
-          <label>Nombre del Titular</label>
-          <input type="text" id="nombre" placeholder="Juan Pérez" required />
+          <label for="nombre">Nombre del Titular</label>
+          <input
+            type="text"
+            id="nombre"
+            placeholder="Juan Pérez"
+            required
+            pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$"
+          />
+          <div class="error-feedback" id="error-nombre">
+            Por favor, ingresa solo letras y espacios.
+          </div>
         </div>
+
         <div class="form-group">
-          <label>Número de Tarjeta</label>
+          <label for="tarjeta">Número de Tarjeta</label>
           <input
             type="text"
             id="tarjeta"
             placeholder="4556 1234 5678 9101"
+            maxlength="19"
             required
           />
+          <div class="error-feedback" id="error-tarjeta">
+            Número de tarjeta inválido (debe tener entre 13 y 16 dígitos
+            numéricos).
+          </div>
         </div>
+
         <div
           class="form-group"
           style="display: flex; flex-direction: row; gap: 10px"
         >
           <div style="flex: 1" class="form-group">
-            <label>Vencimiento</label>
-            <input type="text" placeholder="12/29" required />
+            <label for="vencimiento">Vencimiento</label>
+            <input
+              type="text"
+              id="vencimiento"
+              placeholder="MM/AA"
+              maxlength="5"
+              required
+            />
+            <div class="error-feedback" id="error-vencimiento">
+              Formato MM/AA inválido o tarjeta vencida.
+            </div>
           </div>
           <div style="flex: 1" class="form-group">
-            <label>CVV</label>
-            <input type="password" placeholder="123" required />
+            <label for="cvv">CVV</label>
+            <input
+              type="password"
+              id="cvv"
+              placeholder="123"
+              maxlength="3"
+              pattern="\d{3}"
+              required
+            />
+            <div class="error-feedback" id="error-cvv">
+              Debe ser de 3 dígitos numéricos.
+            </div>
           </div>
         </div>
 
+        <input type="hidden" id="total-hidden" value="0" />
+
         <button
           type="submit"
+          id="boton-confirmar"
           class="btn"
           style="width: 100%; border: none; cursor: pointer; margin-top: 10px"
         >
@@ -119,26 +180,159 @@
     </div>
 
     <script>
-      // Capturar las variables que vienen en la URL (?producto=X&precio=Y)
-      const urlParams = new URLSearchParams(window.location.search);
-      const producto = urlParams.get("producto");
-      const precio = urlParams.get("precio");
+      // 1. Cargar datos del Carrito
+      let totalFinal = parseInt(localStorage.getItem("total_compra")) || 0;
+      let carritoItems =
+        JSON.parse(localStorage.getItem("carrito_compra")) || [];
 
-      // Mostrarlas en pantalla
-      document.getElementById("nombre-producto").innerText = producto;
-      document.getElementById("precio-producto").innerText =
-        `$${parseInt(precio).toLocaleString("es-CL")}`;
+      const resumenPedido = document.getElementById("resumen-pedido");
+      const precioDisplay = document.getElementById("precio-producto");
+      const inputHiddenTotal = document.getElementById("total-hidden");
+      const botonConfirmar = document.getElementById("boton-confirmar");
 
-      // Enviar el pago al backend en Node.js
+      if (carritoItems.length === 0) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productoURL = urlParams.get("producto");
+        const precioURL = parseInt(urlParams.get("precio")) || 0;
+
+        if (productoURL && precioURL > 0) {
+          totalFinal = precioURL;
+          carritoItems = [
+            { nombre: productoURL, precio: precioURL, cantidad: 1 },
+          ];
+        }
+      }
+
+      if (carritoItems.length > 0) {
+        resumenPedido.innerHTML = carritoItems
+          .map(
+            (item) =>
+              `<li>${item.nombre} <span style="color:#777;">(x${item.cantidad})</span> - $${(item.precio * item.cantidad).toLocaleString("es-CL")}</li>`,
+          )
+          .join("");
+      } else {
+        resumenPedido.innerHTML = "<li>Ningún producto seleccionado</li>";
+      }
+
+      precioDisplay.innerText = `$${totalFinal.toLocaleString("es-CL")}`;
+      inputHiddenTotal.value = totalFinal;
+      botonConfirmar.innerText = `Pagar $${totalFinal.toLocaleString("es-CL")} con Transbank Ficticio`;
+
+      // ==========================================
+      // 2. MÁSCARAS Y FORMATEADORES EN TIEMPO REAL
+      // ==========================================
+
+      const inputTarjeta = document.getElementById("tarjeta");
+      inputTarjeta.addEventListener("input", (e) => {
+        let valor = e.target.value.replace(/\D/g, "");
+        let valorFormateado = valor.match(/.{1,4}/g);
+        e.target.value = valorFormateado ? valorFormateado.join(" ") : valor;
+      });
+
+      const inputVencimiento = document.getElementById("vencimiento");
+      inputVencimiento.addEventListener("input", (e) => {
+        let valor = e.target.value.replace(/\D/g, "");
+        if (valor.length > 2) {
+          e.target.value = valor.slice(0, 2) + "/" + valor.slice(2, 4);
+        } else {
+          e.target.value = valor;
+        }
+      });
+
+      const inputCvv = document.getElementById("cvv");
+      inputCvv.addEventListener("input", (e) => {
+        e.target.value = e.target.value.replace(/\D/g, "");
+      });
+
+      // ==========================================
+      // 3. FUNCIONES DE VALIDACIÓN SIMPLIFICADAS
+      // ==========================================
+
+      // Nueva validación simplificada: Solo revisa longitud numérica real
+      function validarTarjetaFicticia(numeroTarjeta) {
+        const limpio = numeroTarjeta.replace(/\s+/g, "");
+        return /^\d{13,16}$/.test(limpio);
+      }
+
+      function validarExpiracion(fechaStr) {
+        if (!/^\d{2}\/\d{2}$/.test(fechaStr)) return false;
+
+        const partes = fechaStr.split("/");
+        const mes = parseInt(partes[0], 10);
+        const anio = parseInt("20" + partes[1], 10);
+
+        if (mes < 1 || mes > 12) return false;
+
+        const fechaActual = new Date();
+        const anioActual = fechaActual.getFullYear();
+        const mesActual = fechaActual.getMonth() + 1;
+
+        if (anio < anioActual) return false;
+        if (anio === anioActual && mes < mesActual) return false;
+
+        return true;
+      }
+
+      // ==========================================
+      // 4. ENVÍO DEL FORMULARIO CON VALIDACIÓN
+      // ==========================================
       document
         .getElementById("form-pago")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
 
+          document
+            .querySelectorAll(".error-feedback")
+            .forEach((el) => (el.style.display = "none"));
+
+          let formularioValido = true;
+
+          // Validar Nombre
+          const nombreVal = document.getElementById("nombre").value.trim();
+          if (
+            !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombreVal) ||
+            nombreVal.length < 3
+          ) {
+            document.getElementById("error-nombre").style.display = "block";
+            formularioValido = false;
+          }
+
+          // Validar Tarjeta simplificada
+          const tarjetaVal = inputTarjeta.value;
+          if (!validarTarjetaFicticia(tarjetaVal)) {
+            document.getElementById("error-tarjeta").style.display = "block";
+            formularioValido = false;
+          }
+
+          // Validar Expiración
+          const vencimientoVal = inputVencimiento.value;
+          if (!validarExpiracion(vencimientoVal)) {
+            document.getElementById("error-vencimiento").style.display =
+              "block";
+            formularioValido = false;
+          }
+
+          // Validar CVV
+          const cvvVal = inputCvv.value;
+          if (!/^\d{3}$/.test(cvvVal)) {
+            document.getElementById("error-cvv").style.display = "block";
+            formularioValido = false;
+          }
+
+          if (!formularioValido) {
+            return;
+          }
+
+          if (totalFinal <= 0) {
+            alert("⚠️ El monto a pagar debe ser mayor a $0.");
+            return;
+          }
+
           const datos = {
-            nombre: document.getElementById("nombre").value,
-            tarjeta: document.getElementById("tarjeta").value,
-            total: precio,
+            nombre: nombreVal,
+            tarjeta: tarjetaVal.replace(/\s+/g, ""),
+            total: totalFinal,
+            items: carritoItems,
           };
 
           try {
@@ -152,11 +346,19 @@
 
             if (resultado.status === "aprobado") {
               document.getElementById("resultado-pago").innerHTML = `
-                        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; color: green; border: 1px solid green;">
-                            🟢 ${resultado.mensaje}<br>
-                            <small style="color: #555;">ID Transacción: ${resultado.transaccion_id}</small>
-                        </div>
-                    `;
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; color: green; border: 1px solid green; text-align: left;">
+                    🟢 <strong>${resultado.mensaje}</strong><br>
+                    <small style="color: #555; display: block; margin-top: 5px;">ID Transacción: ${resultado.transaccion_id}</small>
+                    <small style="color: #777; display: block;">Simulador Transbank: Conexión segura exitosa.</small>
+                </div>
+              `;
+
+              localStorage.removeItem("total_compra");
+              localStorage.removeItem("carrito_compra");
+
+              botonConfirmar.disabled = true;
+              botonConfirmar.style.opacity = "0.5";
+              botonConfirmar.style.cursor = "not-allowed";
             } else {
               document.getElementById("resultado-pago").innerText =
                 `🔴 Error: ${resultado.mensaje}`;
